@@ -21,7 +21,7 @@ align-items:center;
 }
 
 #message{
-font-size:60px;
+font-size:64px;
 color:#ff3366;
 opacity:0;
 transition:2s;
@@ -35,13 +35,42 @@ left:0;
 pointer-events:none;
 }
 
+.balloon{
+position:fixed;
+bottom:-150px;
+width:40px;
+height:50px;
+border-radius:50%;
+opacity:0.9;
+animation:float linear infinite;
+}
+
+.balloon::after{
+content:"";
+position:absolute;
+width:2px;
+height:40px;
+background:#999;
+left:50%;
+top:50px;
+}
+
+@keyframes float{
+from{
+transform:translateY(0);
+}
+to{
+transform:translateY(-120vh);
+}
+}
+
 </style>
+
 </head>
 
 <body>
 
 <section></section>
-
 <section></section>
 
 <section id="message">
@@ -66,7 +95,7 @@ x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
 size:Math.random()*6+3,
 speed:Math.random()*6+4,
-color:`hsl(${Math.random()*360},100%,50%)`
+color:`hsl(${Math.random()*360},100%,60%)`
 });
 }
 
@@ -92,22 +121,48 @@ requestAnimationFrame(draw);
 
 }
 
-let started=false;
+let confettiStarted=false;
+let balloonsStarted=false;
 
 window.addEventListener("scroll",()=>{
 
 let scroll=window.scrollY;
 
-if(scroll>300 && !started){
+if(scroll>300 && !confettiStarted){
 draw();
-started=true;
+confettiStarted=true;
 }
 
-if(scroll>900){
+if(scroll>700 && !balloonsStarted){
+createBalloons();
+balloonsStarted=true;
+}
+
+if(scroll>1000){
 document.getElementById("message").style.opacity=1;
 }
 
 });
+
+function createBalloons(){
+
+for(let i=0;i<25;i++){
+
+let b=document.createElement("div");
+
+b.className="balloon";
+
+b.style.left=Math.random()*100+"%";
+
+b.style.background=`hsl(${Math.random()*360},70%,60%)`;
+
+b.style.animationDuration=(6+Math.random()*5)+"s";
+
+document.body.appendChild(b);
+
+}
+
+}
 
 </script>
 
