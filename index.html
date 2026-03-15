@@ -8,42 +8,23 @@
 
 body{
 margin:0;
-font-family:sans-serif;
 background:white;
+font-family:sans-serif;
 overflow-x:hidden;
 }
 
-.section{
-height:100vh;
+section{
+height:120vh;
 display:flex;
 justify-content:center;
 align-items:center;
-font-size:40px;
-}
-
-#start{
-background:white;
-}
-
-#cracker{
-background:#fff7f7;
-font-size:60px;
-opacity:0;
-transition:1s;
-}
-
-#confetti{
-background:#fdf6ff;
-opacity:0;
-transition:1s;
 }
 
 #message{
-background:#fff0f5;
-font-size:55px;
-color:#ff4d6d;
+font-size:60px;
+color:#ff3366;
 opacity:0;
-transition:1.5s;
+transition:2s;
 text-align:center;
 }
 
@@ -59,27 +40,19 @@ pointer-events:none;
 
 <body>
 
-<section class="section" id="start">
-↓ スクロールしてね ↓
-</section>
+<section></section>
 
-<section class="section" id="cracker">
-🎉
-</section>
+<section></section>
 
-<section class="section" id="confetti">
-🎊
-</section>
-
-<section class="section" id="message">
+<section id="message">
 りつ<br>お誕生日おめでとう
 </section>
 
-<canvas id="canvas"></canvas>
+<canvas id="confetti"></canvas>
 
 <script>
 
-const canvas=document.getElementById("canvas");
+const canvas=document.getElementById("confetti");
 const ctx=canvas.getContext("2d");
 
 canvas.width=window.innerWidth;
@@ -87,20 +60,22 @@ canvas.height=window.innerHeight;
 
 let confetti=[];
 
-for(let i=0;i<200;i++){
+for(let i=0;i<300;i++){
 confetti.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-size:Math.random()*5+2,
-speed:Math.random()*3+1,
+size:Math.random()*6+3,
+speed:Math.random()*6+4,
 color:`hsl(${Math.random()*360},100%,50%)`
 });
 }
 
-function drawConfetti(){
+function draw(){
+
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
 confetti.forEach(c=>{
+
 ctx.fillStyle=c.color;
 ctx.fillRect(c.x,c.y,c.size,c.size);
 
@@ -110,36 +85,26 @@ if(c.y>canvas.height){
 c.y=0;
 c.x=Math.random()*canvas.width;
 }
+
 });
 
-requestAnimationFrame(drawConfetti);
+requestAnimationFrame(draw);
+
 }
 
-let confettiStarted=false;
+let started=false;
 
 window.addEventListener("scroll",()=>{
 
-let cracker=document.getElementById("cracker");
-let confettiSec=document.getElementById("confetti");
-let message=document.getElementById("message");
+let scroll=window.scrollY;
 
-let scrollY=window.scrollY;
-
-if(scrollY>200){
-cracker.style.opacity=1;
+if(scroll>300 && !started){
+draw();
+started=true;
 }
 
-if(scrollY>600){
-confettiSec.style.opacity=1;
-
-if(!confettiStarted){
-drawConfetti();
-confettiStarted=true;
-}
-}
-
-if(scrollY>1000){
-message.style.opacity=1;
+if(scroll>900){
+document.getElementById("message").style.opacity=1;
 }
 
 });
