@@ -14,18 +14,26 @@ overflow-x:hidden;
 }
 
 section{
-height:120vh;
+height:80vh;
 display:flex;
 justify-content:center;
 align-items:center;
 }
 
+#final{
+position:relative;
+background:black;
+color:white;
+overflow:hidden;
+}
+
 #message{
-font-size:64px;
-color:#ff2d55;
+font-size:70px;
 opacity:0;
-transition:2s;
+transform:scale(0.8);
+transition:1.5s;
 text-align:center;
+z-index:2;
 }
 
 canvas{
@@ -33,6 +41,12 @@ position:fixed;
 top:0;
 left:0;
 pointer-events:none;
+}
+
+#laserCanvas{
+position:absolute;
+top:0;
+left:0;
 }
 
 .balloon{
@@ -61,8 +75,14 @@ top:65px;
 <section></section>
 <section></section>
 
-<section id="message">
+<section id="final">
+
+<div id="message">
 りつ<br>お誕生日おめでとう
+</div>
+
+<canvas id="laserCanvas"></canvas>
+
 </section>
 
 <canvas id="confetti"></canvas>
@@ -77,35 +97,46 @@ canvas.height=window.innerHeight;
 
 let confetti=[];
 
-for(let i=0;i<250;i++){
+function createBurst(side){
+
+for(let i=0;i<120;i++){
+
 confetti.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-size:Math.random()*6+2,
-speed:Math.random()*7+4,
+
+x: side==="left" ? 0 : canvas.width,
+y: canvas.height/2,
+
+vx:(side==="left"?1:-1)*(Math.random()*8+4),
+vy:(Math.random()*6-3),
+
+size:Math.random()*6+3,
+
 color:`hsl(${Math.random()*360},100%,60%)`
+
 });
+
 }
 
-function drawConfetti(){
+}
+
+function draw(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
 confetti.forEach(c=>{
 
 ctx.fillStyle=c.color;
+
 ctx.fillRect(c.x,c.y,c.size,c.size);
 
-c.y+=c.speed;
+c.x+=c.vx;
+c.y+=c.vy;
 
-if(c.y>canvas.height){
-c.y=0;
-c.x=Math.random()*canvas.width;
-}
+c.vy+=0.05;
 
 });
 
-requestAnimationFrame(drawConfetti);
+requestAnimationFrame(draw);
 
 }
 
@@ -122,6 +153,7 @@ b.style.background=`hsl(${Math.random()*360},70%,65%)`;
 document.body.appendChild(b);
 
 let pos=-120;
+
 let drift=(Math.random()*1.5)-0.75;
 
 function float(){
@@ -150,20 +182,24 @@ float();
 
 let confettiStarted=false;
 let balloonsStarted=false;
+let laserStarted=false;
 
 window.addEventListener("scroll",()=>{
 
 let scroll=window.scrollY;
 
-if(scroll>300 && !confettiStarted){
+if(scroll>150 && !confettiStarted){
 
-drawConfetti();
+createBurst("left");
+createBurst("right");
+
+draw();
 
 confettiStarted=true;
 
 }
 
-if(scroll>600 && !balloonsStarted){
+if(scroll>350 && !balloonsStarted){
 
 balloonsStarted=true;
 
@@ -171,13 +207,76 @@ setInterval(createBalloon,300);
 
 }
 
-if(scroll>1000){
+if(scroll>600 && !laserStarted){
 
-document.getElementById("message").style.opacity=1;
+startLasers();
+
+let msg=document.getElementById("message");
+
+msg.style.opacity=1;
+msg.style.transform="scale(1)";
+
+laserStarted=true;
 
 }
 
 });
+
+function startLasers(){
+
+const laserCanvas=document.getElementById("laserCanvas");
+const lctx=laserCanvas.getContext("2d");
+
+laserCanvas.width=window.innerWidth;
+laserCanvas.height=window.innerHeight;
+
+let lasers=[];
+
+for(let i=0;i<20;i++){
+
+lasers.push({
+
+x:Math.random()*laserCanvas.width,
+y:Math.random()*laserCanvas.height,
+
+vx:(Math.random()*4)-2,
+vy:(Math.random()*4)-2,
+
+color:`hsl(${Math.random()*360},100%,60%)`
+
+});
+
+}
+
+function drawLaser(){
+
+lctx.fillStyle="rgba(0,0,0,0.2)";
+lctx.fillRect(0,0,laserCanvas.width,laserCanvas.height);
+
+lasers.forEach(l=>{
+
+lctx.beginPath();
+lctx.moveTo(l.x,l.y);
+lctx.lineTo(l.x+l.vx*40,l.y+l.vy*40);
+lctx.strokeStyle=l.color;
+lctx.lineWidth=3;
+lctx.stroke();
+
+l.x+=l.vx;
+l.y+=l.vy;
+
+if(l.x<0||l.x>laserCanvas.width) l.vx*=-1;
+if(l.y<0||l.y>laserCanvas.height) l.vy*=-1;
+
+});
+
+requestAnimationFrame(drawLaser);
+
+}
+
+drawLaser();
+
+}
 
 </script>
 
