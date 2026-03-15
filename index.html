@@ -5,86 +5,145 @@
 <title>Happy Birthday</title>
 
 <style>
+
 body{
-  margin:0;
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  background:#fff5f8;
-  font-family:sans-serif;
+margin:0;
+font-family:sans-serif;
+background:white;
+overflow-x:hidden;
 }
 
-h1{
-  font-size:50px;
-  color:#ff4d6d;
-  text-align:center;
-  z-index:2;
+.section{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:40px;
+}
+
+#start{
+background:white;
+}
+
+#cracker{
+background:#fff7f7;
+font-size:60px;
+opacity:0;
+transition:1s;
+}
+
+#confetti{
+background:#fdf6ff;
+opacity:0;
+transition:1s;
+}
+
+#message{
+background:#fff0f5;
+font-size:55px;
+color:#ff4d6d;
+opacity:0;
+transition:1.5s;
+text-align:center;
 }
 
 canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:1;
+position:fixed;
+top:0;
+left:0;
+pointer-events:none;
 }
+
 </style>
 </head>
 
 <body>
 
-<h1>りつ<br>お誕生日おめでとう 🎉</h1>
-<canvas id="confetti"></canvas>
+<section class="section" id="start">
+↓ スクロールしてね ↓
+</section>
+
+<section class="section" id="cracker">
+🎉
+</section>
+
+<section class="section" id="confetti">
+🎊
+</section>
+
+<section class="section" id="message">
+りつ<br>お誕生日おめでとう
+</section>
+
+<canvas id="canvas"></canvas>
 
 <script>
-const canvas = document.getElementById("confetti");
-const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
 
-let confetti = [];
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
-for(let i=0;i<150;i++){
-  confetti.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height - canvas.height,
-    r: Math.random()*6+2,
-    d: Math.random()*50,
-    color: "hsl(" + Math.random()*360 + ",100%,50%)",
-    tilt: Math.random()*10-10
-  });
+let confetti=[];
+
+for(let i=0;i<200;i++){
+confetti.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*5+2,
+speed:Math.random()*3+1,
+color:`hsl(${Math.random()*360},100%,50%)`
+});
 }
 
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+function drawConfetti(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  confetti.forEach((c,i)=>{
-    ctx.beginPath();
-    ctx.lineWidth=c.r;
-    ctx.strokeStyle=c.color;
-    ctx.moveTo(c.x+c.tilt,c.y);
-    ctx.lineTo(c.x+c.tilt+c.r/2,c.y+c.tilt);
-    ctx.stroke();
-  });
+confetti.forEach(c=>{
+ctx.fillStyle=c.color;
+ctx.fillRect(c.x,c.y,c.size,c.size);
 
-  update();
+c.y+=c.speed;
+
+if(c.y>canvas.height){
+c.y=0;
+c.x=Math.random()*canvas.width;
+}
+});
+
+requestAnimationFrame(drawConfetti);
 }
 
-function update(){
-  confetti.forEach((c)=>{
-    c.y += Math.cos(c.d)+2;
-    c.x += Math.sin(0.01*c.d);
+let confettiStarted=false;
 
-    if(c.y>canvas.height){
-      c.y=-10;
-      c.x=Math.random()*canvas.width;
-    }
-  });
+window.addEventListener("scroll",()=>{
+
+let cracker=document.getElementById("cracker");
+let confettiSec=document.getElementById("confetti");
+let message=document.getElementById("message");
+
+let scrollY=window.scrollY;
+
+if(scrollY>200){
+cracker.style.opacity=1;
 }
 
-setInterval(draw,20);
+if(scrollY>600){
+confettiSec.style.opacity=1;
+
+if(!confettiStarted){
+drawConfetti();
+confettiStarted=true;
+}
+}
+
+if(scrollY>1000){
+message.style.opacity=1;
+}
+
+});
+
 </script>
 
 </body>
